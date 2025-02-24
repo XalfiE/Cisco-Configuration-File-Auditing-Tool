@@ -1,0 +1,131 @@
+# Full Cisco Firewall Configuration with Security Misconfigurations
+# WARNING: This configuration is intentionally insecure for testing purposes
+
+# 1. Interface Configuration (Misconfigured)
+interface GigabitEthernet0/0
+ description WAN Interface - Insecure
+ ip address 0.0.0.0  # No proper WAN IP
+ no shutdown
+ no security-level 100  # No security level assigned
+exit
+
+interface GigabitEthernet0/1
+ description LAN Interface - Internal Users
+ ip address 192.168.1.1 255.255.255.0
+ no shutdown
+ no security-level 100  # No security level assigned
+exit
+
+# 2. Firewall Rules (Misconfigured - Overly Permissive)
+access-list 100 permit ip any any  # Allows all traffic in both directions
+access-list 100 deny ip any any log  # Logs all traffic but doesn't prevent attacks
+
+ip access-group 100 in
+exit
+
+# 3. Intrusion Prevention System (IPS Disabled)
+ip ips name No_IPS
+ no ip ips enable  # IPS completely turned off
+
+# 4. Application Control (No Restrictions)
+class-map match-all Allow_All_Apps
+ match protocol any  # No restrictions, all applications allowed
+policy-map Insecure_Policy
+ class Allow_All_Apps
+  permit
+exit
+
+# 5. Web Filtering (Disabled)
+url-filter No_Filter
+ no block-category social-networking
+ no block-category gambling
+ no block-category malware  # No protection against malicious sites
+exit
+
+# 6. VPN Configuration (Weak Security)
+crypto isakmp policy 10
+ encr des  # Weak encryption standard
+ hash md5  # Deprecated hash algorithm
+ authentication none  # No authentication required
+ group 1  # Weak Diffie-Hellman group
+ lifetime 86400
+exit
+
+crypto ipsec transform-set VPN-SET esp-des esp-md5-hmac  # Weak encryption
+exit
+
+# 7. Data Loss Prevention (DLP Disabled)
+parameter-map type regex No_DLP_FILTER
+ no pattern "(exe|zip|rar|pdf|doc)"  # No restriction on sensitive files
+exit
+
+policy-map type inspect http No_DLP
+ match request uri regex-class No_DLP_FILTER
+ permit log
+exit
+
+# 8. SD-WAN Configuration (Disabled)
+no track 1 ip sla 1 reachability
+no ip sla 1
+exit
+
+# 9. Logging (Disabled - No Record of Events)
+no logging enable  # No logs recorded
+no logging buffered
+no logging trap
+exit
+
+# 10. User Authentication (Weak Credentials Allowed)
+username admin secret admin  # Weak password, easy to brute-force
+username guest secret guest  # Guest user with admin access
+exit
+
+# 11. Management Services (Insecure Access)
+ip http server  # Enables non-secure HTTP access
+no ip ssh version 2  # Allows weaker SSH version 1
+no login block-for  # No brute-force protection
+line vty 0 4
+ transport input all  # Allows all remote access types
+ login
+exit
+
+# 12. SNMP Configuration (Unrestricted Access)
+snmp-server community public RO  # Default SNMP community string
+snmp-server group insecure-group v1 noauth  # No authentication on SNMP
+snmp-server host 192.168.1.2 public  # Allows SNMP queries from any source
+exit
+
+# 13. ARP Inspection (Disabled - Allows Spoofing)
+no ip arp inspection vlan 1
+no ip arp inspection validate src-mac dst-mac ip  # Disables ARP validation
+exit
+
+# 14. DHCP Snooping (Disabled - No Protection Against Rogue DHCP)
+no ip dhcp snooping
+no ip dhcp snooping vlan 1  # Allows rogue DHCP servers
+exit
+
+# 15. NAT Configuration (Misconfigured - Overexposed)
+ip nat inside source list 1 interface GigabitEthernet0/0 overload
+access-list 1 permit any  # NAT applies to all traffic, including unauthorized
+exit
+
+# 16. Static Routing (No Default Route)
+no ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/0  # No fallback route, network instability possible
+exit
+
+# 17. Stateful Inspection (CBAC Disabled)
+no ip inspect name CBAC_FIREWALL tcp
+no ip inspect name CBAC_FIREWALL udp
+no ip inspect name CBAC_FIREWALL icmp
+exit
+
+# 18. VLAN Segmentation (Disabled - Flat Network)
+no vlan 10  # All devices are in the same VLAN, no segmentation
+no vlan 20
+exit
+
+# 19. Advanced Threat Protection (Disabled)
+no ip threat-detection scanning
+no ip threat-detection rate-based  # No detection of network scanning
+exit
