@@ -1,7 +1,6 @@
 # 🔍 Cisco Configuration File Auditing Tool (CCFAT)
 
-This executable analyzes a **Cisco IOS configuration file** and verifies compliance with **recommended security best practices**, primarily based on the **CIS Cisco IOS 12 Benchmark v4.0.0**.
-
+This executable analyzes a **Cisco IOS configuration file** and verifies compliance with **recommended security best practices**
 ## 📌 Key Compliance Checks
 
 The tool ensures your configuration aligns with security best practices by checking for:
