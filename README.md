@@ -37,3 +37,5 @@ The tool ensures your configuration aligns with security best practices by check
 
 ⚡ **Ensure your Cisco IOS configurations meet industry security standards!**  
 💡 Feel free to contribute, submit issues, or request features. 🚀
+
+Building cool things in tech ☁️ | Open-source & security 🚀 | Fuel my work ☕ → https://www.buymeacoffee.com/alfie
